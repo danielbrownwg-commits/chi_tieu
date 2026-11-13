@@ -22,16 +22,18 @@ body{margin:0;background:var(--bg);color:var(--tx);font:17px/1.55 var(--f);font-
 button,input{font:inherit;color:inherit}button{background:none;border:0;padding:0;cursor:pointer;text-align:left}
 h1{font-size:26px;font-weight:400;margin:0;letter-spacing:-.01em}
 .lb{font-style:italic;color:var(--mu);font-size:14.5px}
-.hd{display:flex;justify-content:space-between;align-items:baseline;border-bottom:3px double var(--ln);padding-bottom:8px;margin-bottom:18px}
+.hd{display:flex;justify-content:space-between;align-items:center;border-bottom:3px double var(--ln);padding-bottom:8px;margin-bottom:18px}
+.hd div{text-align:center}
+.hd small{display:block;font-size:12.5px;font-style:italic;color:var(--mu);margin-top:-2px}
 .hd button{font-size:28px;padding:0 12px;color:var(--ac);line-height:1}
 .big{font-size:52px;line-height:1.05;letter-spacing:-.02em;margin:2px 0 14px}.big.neg{color:var(--wr)}
 .big small{font-size:.38em;color:var(--mu)}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--ln);border-bottom:1px solid var(--ln);padding:10px 0;margin-bottom:10px;gap:8px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--ln);border-bottom:1px solid var(--ln);padding:10px 0;margin-bottom:12px;gap:8px}
 .st span{display:block;font-size:13px;font-style:italic;color:var(--mu);margin-bottom:2px}
 .st strong{font-size:16px;font-weight:600;white-space:nowrap}
 .kv{display:flex;justify-content:space-between;align-items:baseline;padding:9px 0;border-top:1px solid var(--ln);width:100%}
-.bar{height:5px;background:var(--sf);margin:10px 0 6px;border-radius:2px;overflow:hidden}.bar i{display:block;height:100%;background:var(--ac)}
-.sec{margin:26px 0 6px;font-size:20px;font-weight:600;border-bottom:1px solid var(--ln);padding-bottom:5px;display:flex;justify-content:space-between;align-items:baseline}
+.bar{height:5px;background:var(--sf);margin:12px 0 4px;border-radius:2px;overflow:hidden}.bar i{display:block;height:100%;background:var(--ac)}
+.sec{margin:22px 0 6px;font-size:20px;font-weight:600;border-bottom:1px solid var(--ln);padding-bottom:5px;display:flex;justify-content:space-between;align-items:baseline}
 .r{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:11px 0;border-bottom:1px solid var(--ln);width:100%}
 .r>span:first-child{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .r small{display:block;color:var(--mu);font-size:13.5px;font-style:italic;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -66,22 +68,39 @@ nav .on{color:var(--ac);border-top-color:var(--ac);font-weight:600}
 .bkb{background:var(--sf);border-left:3px solid var(--wr);padding:10px 12px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;font-size:14px;border-radius:0 3px 3px 0}
 .sub{display:flex;justify-content:space-between;font-size:14px;color:var(--mu);font-style:italic;padding:2px 0 8px;border-bottom:1px solid var(--ln)}
 .tag{font-size:11.5px;padding:1px 5px;border:1px solid var(--ln);border-radius:2px;margin-left:6px;color:var(--mu);font-style:normal}
+#lk{position:fixed;inset:0;background:var(--bg);z-index:50;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:24px}
+.dots{display:flex;gap:14px;margin:20px 0 32px}
+.dots i{width:13px;height:13px;border-radius:50%;border:1.5px solid var(--ac);transition:.15s}
+.dots i.on{background:var(--ac)}
+. dots.err i{border-color:var(--wr);background:var(--wr)}
+.pkp{display:grid;grid-template-columns:repeat(3,76px);gap:14px}
+.pkp button{height:60px;font-size:24px;background:var(--sf);border-radius:6px;text-align:center}
 </style></head><body>
 <main id="app"><div id="v"></div></main>
 <button class="fab" data-a="add" aria-label="Thêm khoản">+</button>
 <nav><button data-a="go" data-v="home">Tổng quan</button><button data-a="go" data-v="cats">Danh mục</button><button data-a="go" data-v="hist">Lịch sử</button><button data-a="go" data-v="set">Cài đặt</button></nav>
-<div id="sh" hidden></div><div id="tt" hidden></div>
+<div id="sh" hidden></div><div id="tt" hidden></div><div id="lk" hidden></div>
 <script>
 const $=s=>document.querySelector(s),E=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])),f=n=>Math.round(n).toLocaleString('vi-VN');
 const PAL=['#4A5D3A','#A0674A','#B79B66','#7B5B3F','#9C4A2F','#8A8678','#6B7F5A','#5C4A3A'];
-const key=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
-const pmk=k=>{const[y,m]=k.split('-');return key(new Date(+y,+m-2,1))};
 let S;try{S=JSON.parse(localStorage.getItem('cto'))}catch(e){}
-S=S||{cats:['Ăn uống','Đi lại','Học tập','Nhà trọ','Giải trí','Mua sắm','Sức khoẻ','Khác'].map((n,i)=>({id:'c'+i,name:n,color:PAL[i]})),tx:[],cap:{},fix:[],ops:0};
-S.cap=S.cap||{};S.fix=S.fix||[];S.ops=S.ops||0;
+S=S||{cats:['Ăn uống','Đi lại','Học tập','Nhà trọ','Giải trí','Mua sắm','Sức khoẻ','Khác'].map((n,i)=>({id:'c'+i,name:n,color:PAL[i]})),tx:[],cap:{},fix:[],ops:0,sd:1,pin:''};
+S.cap=S.cap||{};S.fix=S.fix||[];S.ops=S.ops||0;S.sd=S.sd||1;S.pin=S.pin||'';
 const save=(op=1)=>{if(op)S.ops=(S.ops||0)+1;try{localStorage.setItem('cto',JSON.stringify(S))}catch(e){toast('Không lưu được dữ liệu')}};
 
-let view='home',arg=null,mk=key(new Date()),all=false,q='',fm=null,last=null,pend=null,tmr;
+const key=d=>{
+  const sd=S.sd||1;let y=d.getFullYear(),m=d.getMonth();
+  if(sd>1&&d.getDate()>=sd){m++;if(m>11){m=0;y++}}
+  return y+'-'+String(m+1).padStart(2,'0');
+};
+const pmk=k=>{const[y,m]=k.split('-');const d=new Date(+y,+m-2,1);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')};
+const mRange=k=>{
+  const sd=S.sd||1;if(sd==1)return '';
+  const[y,m]=k.split('-'),s=new Date(+y,+m-2,sd),e=new Date(+y,+m-1,sd-1);
+  return `${s.getDate()}/${s.getMonth()+1} – ${e.getDate()}/${e.getMonth()+1}`;
+};
+
+let view='home',arg=null,mk=key(new Date()),all=false,q='',fm=null,last=null,pend=null,tmr,pinBuf='';
 const cat=id=>S.cats.find(c=>c.id==id),tm=(k=mk)=>S.tx.filter(t=>key(new Date(t.ts))==k),sum=(l,k)=>l.filter(t=>t.t==k).reduce((a,t)=>a+t.amt,0);
 const uses=()=>{const u={};S.tx.forEach(t=>u[t.cat]=(u[t.cat]||0)+1);return[...S.cats].sort((a,b)=>(u[b.id]||0)-(u[a.id]||0))};
 const DN=['Chủ nhật','Thứ hai','Thứ ba','Thứ tư','Thứ năm','Thứ sáu','Thứ bảy'];
@@ -98,12 +117,12 @@ const row=t=>{const c=cat(t.cat);return `<button class=r data-a=ed data-v=${t.id
 const grp=l=>{let d='',h='';[...l].sort((a,b)=>b.ts-a.ts).forEach(t=>{const n=dn(t.ts);if(n!=d){d=n;h+=`<div class=day>${n}</div>`}h+=row(t)});return h||'<p class=lb>Chưa có khoản nào. Bấm nút + để ghi khoản đầu tiên.</p>'};
 const ftx=()=>tm().filter(t=>{const c=cat(t.cat);return((t.note||'')+' '+(c?c.name:'')).toLowerCase().includes(q.toLowerCase())});
 const hl=()=>{const l=ftx(),o=sum(l,'out'),i=sum(l,'in');return(q.trim()?`<div class=sub><span>Kết quả: ${l.length} khoản</span><span>Chi: ${f(o)} đ${i?' | Nạp: '+f(i)+' đ':''}</span></div>`:'')+grp(l)};
-const head=()=>{const[y,m]=mk.split('-');return `<div class=hd><button data-a=mo data-v=-1>‹</button><h1>Tháng ${+m}, ${y}</h1><button data-a=mo data-v=1>›</button></div>`};
+const head=()=>{const[y,m]=mk.split('-'),rg=mRange(mk);return `<div class=hd><button data-a=mo data-v=-1>‹</button><div><h1>Tháng ${+m}, ${y}</h1>${rg?`<small>${rg}</small>`:''}</div><button data-a=mo data-v=1>›</button></div>`};
 
 const V={
 home(){
-  const l=tm(),o=sum(l,'out'),i=sum(l,'in'),c=S.cap[mk]||0,bal=c+i-o,n=new Date(),dl=new Date(n.getFullYear(),n.getMonth()+1,0).getDate()-n.getDate()+1,tot=c+i;
-  const uf=unFix(mk),ufSum=uf.reduce((a,x)=>a+x.amt,0),freeBal=bal-ufSum;
+  const l=tm(),o=sum(l,'out'),i=sum(l,'in'),c=S.cap[mk]||0,bal=c+i-o,tot=c+i;
+  const uf=unFix(mk),ufSum=uf.reduce((a,x)=>a+x.amt,0);
   const bAlert=S.ops>=10?`<div class=bkb><span>Đã có ${S.ops} thay đổi chưa sao lưu</span><button class=lk data-a=ex>Tải JSON ngay</button></div>`:'';
   return head()+bAlert+`<div class=lb>Số dư còn lại</div><div class="big ${bal<0?'neg':''}">${f(bal)}<small> đ</small></div>
   <div class=stats>
@@ -112,8 +131,7 @@ home(){
     <div class=st><span>Đã chi</span><strong>−${f(o)} đ</strong></div>
   </div>
   <div class=bar><i style="width:${tot>0?Math.min(100,o/tot*100):0}%;${o>tot?'background:var(--wr)':''}"></i></div>
-  ${mk==key(n)&&(c||i)?`<div class=lb>Có thể chi mỗi ngày: <strong>${f(Math.max(0,freeBal/dl))} đ</strong>${ufSum?` <small>(đã trừ ${f(ufSum)} đ cố định chờ chi)</small>`:''}</div>`:''}
-  ${uf.length?`<div class=kv style="margin-top:8px;border-top:1px dashed var(--ln)"><span class=lb>Còn ${uf.length} khoản cố định (${f(ufSum)} đ)</span><button class=lk data-a=apf>Ghi nhận tất cả</button></div>`:''}
+  ${uf.length?`<div class=kv style="margin-top:10px;border-top:1px dashed var(--ln)"><span class=lb>Còn ${uf.length} khoản cố định (${f(ufSum)} đ)</span><button class=lk data-a=apf>Ghi nhận tất cả</button></div>`:''}
   <div class=sec><span>Gần đây</span>${S.fix.length?`<button class=lk data-a=mfix>Khoản cố định</button>`:''}</div>${grp(l.sort((a,b)=>b.ts-a.ts).slice(0,6))}`
 },
 cats(){const l=tm(),o=sum(l,'out');return head()+S.cats.map(c=>{const x=l.filter(t=>t.cat==c.id&&t.t=='out');return{c,s:sum(x,'out'),n:x.length}}).sort((a,b)=>b.s-a.s).map(x=>`<button class=r data-a=cat data-v=${x.c.id}><span><i class=sw style="background:${x.c.color}"></i>${E(x.c.name)}<small>${x.n} khoản</small><span class=bar><i style="width:${o?x.s/o*100:0}%;background:${x.c.color}"></i></span></span><span>${f(x.s)}</span></button>`).join('')+`<button class=lk data-a=nc style="margin-top:20px">Thêm danh mục</button>`},
@@ -123,12 +141,14 @@ set(){
   const uf=unFix(mk);
   return `<div class=hd><h1>Cài đặt</h1></div>
   <div class=kv><span>Vốn tháng ${mk.slice(5)}/${mk.slice(0,4)}</span><button class=lk data-a=cap>${S.cap[mk]?f(S.cap[mk])+' đ':'Nhập vốn'}</button></div>
+  <div class=kv><span>Ngày bắt đầu tháng</span><button class=lk data-a=sd>Ngày ${S.sd||1}</button></div>
   <div class=kv><span>Khoản chi cố định (${S.fix.length})</span><button class=lk data-a=mfix>Quản lý</button></div>
   ${uf.length?`<div class=kv><span>Chưa ghi tháng này: ${uf.length} khoản</span><button class=lk data-a=apf>Ghi nhận ngay</button></div>`:''}
+  <div class=kv><span>Khóa PIN màn hình (6 số)</span><button class=lk data-a=pin>${S.pin?'Đã bật (Đổi / Tắt)':'Thiết lập'}</button></div>
   <div class=sec><span>Dữ liệu</span></div>
   <p class=lb>Dữ liệu chỉ nằm trên trình duyệt này (${S.ops||0} thay đổi từ lần lưu trước). Sao lưu gần nhất: ${S.bk?new Date(S.bk).toLocaleDateString('vi-VN'):'chưa có'}.</p>
-  <button class=r data-a=ex><span>Sao lưu (file JSON)</span><span class=lk>Tải về</span></button>
-  <button class=r data-a=csv><span>Xuất bảng tính (CSV)</span><span class=lk>Tải về</span></button>
+  <button class=r data-a=ex><span>Sao lưu (file JSON)</span><span class=lk>Lưu / Chia sẻ</span></button>
+  <button class=r data-a=csv><span>Xuất bảng tính (CSV)</span><span class=lk>Lưu / Chia sẻ</span></button>
   <button class=r data-a=im><span>Khôi phục / Gộp từ file JSON</span><span class=lk>Chọn file</span></button>
   <input type=file id=fl accept=".json,application/json" hidden>`
 }};
@@ -148,12 +168,39 @@ function draw(){
   <button class=pri data-a=fs>${fm.id?'Cập nhật':out?'Lưu khoản chi':'Lưu khoản nạp'}</button>
   ${fm.id?'<button class="pri alt" data-a=del>Xoá khoản này</button>':''}`)
 }
-const dl=(n,x,ty)=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([x],{type:ty}));a.download=n;a.click()};
+
+const dl=async(n,x,ty)=>{
+  const b=new Blob([x],{type:ty});
+  if(window.showSaveFilePicker){
+    try{
+      const h=await showSaveFilePicker({suggestedName:n});
+      const w=await h.createWritable();await w.write(b);await w.close();
+      return toast('Đã lưu file');
+    }catch(e){if(e.name=='AbortError')return}
+  }
+  if(navigator.canShare){
+    const file=new File([b],n,{type:ty});
+    if(navigator.canShare({files:[file]})){
+      try{await navigator.share({files:[file],title:n});return}catch(e){if(e.name=='AbortError')return}
+    }
+  }
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=n;a.click();
+};
+
 const nid=()=>'x'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+
+function drawLock(err){
+  const el=$('#lk');if(!S.pin){el.hidden=true;return}
+  el.hidden=false;
+  el.innerHTML=`<h2 style="margin:0;font-weight:400">Nhập mã PIN</h2>
+  <div class="lb" style="margin-top:4px">${err?'Mã PIN không đúng, thử lại':'Nhập 6 chữ số để mở khóa'}</div>
+  <div class="dots">${[0,1,2,3,4,5].map(i=>`<i class="${i<pinBuf.length?'on':''}"></i>`).join('')}</div>
+  <div class=pkp>${['1','2','3','4','5','6','7','8','9','','0','Xoá'].map(k=>k===''?`<span></span>`:`<button data-a=pk data-v="${k}">${k}</button>`).join('')}</div>`;
+}
 
 const A={
 go:v=>{view=v;render()},
-mo:v=>{const[y,m]=mk.split('-');mk=key(new Date(+y,+m-1+ +v,1));render()},
+mo:v=>{const[y,m]=mk.split('-');const d=new Date(+y,+m-1+ +v,1);mk=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');render()},
 cat:v=>{view='cd';arg=v;all=false;render()},
 sc:()=>{all=!all;render()},
 add:()=>form(null,view=='cd'?arg:null),
@@ -185,10 +232,42 @@ cap:()=>{
 },
 roll:v=>{const el=$('#cp'),cur=+(el.value.replace(/\D/g,''))||0;el.value=Math.max(0,cur+ +v)},
 cs:()=>{S.cap[mk]=+($('#cp').value.replace(/\D/g,''))||0;save();A.close();render()},
+sd:()=>{
+  sheet(`<h2>Ngày bắt đầu chu kỳ tháng</h2>
+  <p class=lb style="margin-top:0">Chọn từ ngày 1 đến 28 (VD: chọn 25 nếu nhận vốn ngày 25 hàng tháng). Từ ngày này trở đi sẽ được tính vào chu kỳ tháng kế tiếp.</p>
+  <input id=sdi class=fi inputmode=numeric placeholder="Ngày (1 - 28)" value="${S.sd||1}">
+  <button class=pri data-a=sds>Lưu cài đặt</button>`);$('#sdi').focus()
+},
+sds:()=>{
+  const d=Math.min(28,Math.max(1,+($('#sdi').value.replace(/\D/g,''))||1));
+  S.sd=d;mk=key(new Date());save();A.close();render();toast('Đã đặt ngày bắt đầu tháng: '+d)
+},
+pin:()=>{
+  sheet(`<h2>Khóa PIN màn hình (6 số)</h2>
+  <p class=lb style="margin-top:0">Yêu cầu nhập 6 chữ số mỗi khi mở ứng dụng.</p>
+  <input id=pni class=fi inputmode=numeric maxlength=6 placeholder="Nhập 6 chữ số mới" value="${E(S.pin||'')}">
+  <button class=pri data-a=pins>Lưu mã PIN</button>
+  ${S.pin?`<button class="pri alt" data-a=pind>Tắt khóa PIN</button>`:''}`);$('#pni').focus()
+},
+pins:()=>{
+  const p=$('#pni').value.replace(/\D/g,'');
+  if(p.length!==6)return toast('Mã PIN phải gồm đúng 6 chữ số');
+  S.pin=p;save(0);A.close();render();toast('Đã bật khóa PIN 6 số')
+},
+pind:()=>{S.pin='';save(0);A.close();render();toast('Đã tắt khóa PIN')},
+pk:v=>{
+  if(v=='Xoá')pinBuf=pinBuf.slice(0,-1);
+  else if(pinBuf.length<6)pinBuf+=v;
+  if(pinBuf.length==6){
+    if(pinBuf===S.pin){pinBuf='';$('#lk').hidden=true;return}
+    pinBuf='';drawLock(1);return;
+  }
+  drawLock(0)
+},
 mfix:()=>{
   const uf=unFix(mk);
   sheet(`<h2>Khoản chi cố định hàng tháng</h2>
-  <p class=lb style="margin-top:0">Tự động trừ trước khi tính hạn mức chi mỗi ngày để tránh ảo tưởng số dư.</p>
+  <p class=lb style="margin-top:0">Quản lý các khoản chi định kỳ mỗi tháng để ghi nhận nhanh một chạm.</p>
   ${S.fix.map(x=>{const c=cat(x.cat);return `<div class=r><span>${E(x.note||c?.name||'Cố định')}<small>${E(c?.name||'Khác')} – ${f(x.amt)} đ</small></span><button class=lk style="color:var(--wr)" data-a=dfix data-v=${x.id}>Xoá</button></div>`}).join('')||'<p class=lb>Chưa có khoản cố định nào.</p>'}
   <div class=sec style="margin-top:18px;font-size:17px">Thêm khoản cố định mới</div>
   <div class=row2><input id=fn class=fi placeholder="Tên (VD: Tiền trọ)"><input id=fa class=fi inputmode=numeric placeholder="Số tiền (đ)"></div>
@@ -205,7 +284,8 @@ afix:()=>{
 dfix:v=>{S.fix=S.fix.filter(x=>x.id!=v);save();A.mfix()},
 apf:()=>{
   const uf=unFix(mk);if(!uf.length)return toast('Đã ghi nhận đủ trong tháng này');
-  const[y,m]=mk.split('-'),now=new Date(),ts=(mk==key(now))?Date.now():new Date(+y,+m-1,1,9,0).getTime();
+  const[y,m]=mk.split('-'),now=new Date(),sd=S.sd||1;
+  const ts=(mk==key(now))?Date.now():(sd>1?new Date(+y,+m-2,sd,9,0).getTime():new Date(+y,+m-1,1,9,0).getTime());
   uf.forEach((x,i)=>S.tx.push({id:nid(),t:'out',amt:x.amt,cat:x.cat,note:x.note,ts:ts+i,fid:x.id}));
   save();A.close();render();toast(`Đã ghi nhận ${uf.length} khoản cố định`)
 },
@@ -217,7 +297,7 @@ dc:()=>{const n=S.tx.filter(t=>t.cat==arg).length;if(!confirm(n?`${n} khoản s�
 ex:()=>{S.bk=Date.now();S.ops=0;save(0);dl('chi-tieu-'+key(new Date())+'.json',JSON.stringify(S),'application/json');render()},
 csv:()=>dl('chi-tieu.csv','\ufeffngày,loại,số tiền,danh mục,ghi chú\n'+[...S.tx].sort((a,b)=>a.ts-b.ts).map(t=>[loc(t.ts).replace('T',' '),t.t=='in'?'nạp':'chi',t.amt,(cat(t.cat)||{}).name||'',(t.note||'').replace(/"/g,'""')].map(x=>`"${x}"`).join(',')).join('\n'),'text/csv'),
 im:()=>$('#fl').click(),
-imo:()=>{if(!pend)return;S=pend;S.cap=S.cap||{};S.fix=S.fix||[];S.ops=0;pend=null;save(0);A.close();render();toast('Đã ghi đè dữ liệu')},
+imo:()=>{if(!pend)return;S=pend;S.cap=S.cap||{};S.fix=S.fix||[];S.ops=0;S.sd=S.sd||1;S.pin=S.pin||'';mk=key(new Date());pend=null;save(0);A.close();render();toast('Đã ghi đè dữ liệu')},
 imm:()=>{
   if(!pend)return;
   const cMap={};
@@ -252,7 +332,7 @@ document.addEventListener('change',e=>{
   };
   r.readAsText(e.target.files[0])
 });
-render();if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();
+render();drawLock(0);if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();
 
 if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js').catch(()=>{})})}
 </script></body></html>
